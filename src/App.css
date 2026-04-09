@@ -280,6 +280,11 @@ a {
   color: var(--danger);
 }
 
+.info-alert {
+  background: #e8f0f7;
+  color: #27435e;
+}
+
 .field-group {
   display: grid;
   gap: 0.55rem;
@@ -324,6 +329,173 @@ a {
 .chart-row {
   display: grid;
   gap: 0.45rem;
+}
+
+.pie-card-content {
+  display: grid;
+  grid-template-columns: minmax(220px, 280px) 1fr;
+  gap: 1.5rem;
+  align-items: center;
+}
+
+.pie-chart-shell {
+  position: relative;
+  width: min(100%, 240px);
+  margin: 0 auto;
+}
+
+.pie-chart {
+  display: block;
+  width: 100%;
+  height: auto;
+  transform: rotate(-90deg);
+}
+
+.pie-chart-track,
+.pie-chart-present,
+.pie-chart-absent {
+  fill: none;
+  stroke-width: 18;
+}
+
+.pie-chart-track {
+  stroke: #deebf2;
+}
+
+.pie-chart-present {
+  stroke: #0f766e;
+  stroke-linecap: butt;
+}
+
+.pie-chart-absent {
+  stroke: #c2410c;
+  stroke-linecap: butt;
+}
+
+.pie-chart-center {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  text-align: center;
+  width: 54%;
+  height: 54%;
+  margin: auto;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.96);
+  box-shadow: inset 0 0 0 1px rgba(24, 36, 51, 0.06);
+  z-index: 1;
+}
+
+.pie-chart-center strong {
+  display: block;
+  font-size: 2rem;
+  letter-spacing: -0.04em;
+}
+
+.pie-chart-center span {
+  color: var(--muted);
+  font-weight: 600;
+}
+
+.pie-legend {
+  display: grid;
+  gap: 1rem;
+}
+
+.pie-legend-row {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 0.75rem;
+  align-items: center;
+  padding: 0.9rem 1rem;
+  border-radius: 18px;
+  background: rgba(231, 238, 245, 0.72);
+}
+
+.pie-swatch {
+  width: 14px;
+  height: 14px;
+  border-radius: 999px;
+}
+
+.pie-swatch-present {
+  background: #0f766e;
+}
+
+.pie-swatch-absent {
+  background: #c2410c;
+}
+
+.attendance-table-card {
+  margin-top: 1.5rem;
+}
+
+.table-filter-row {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr;
+  gap: 1rem;
+  margin: 1.25rem 0;
+}
+
+.table-filter-field {
+  margin-bottom: 0;
+}
+
+.table-shell {
+  overflow-x: auto;
+  border-radius: 22px;
+  border: 1px solid rgba(24, 36, 51, 0.08);
+  background: rgba(255, 255, 255, 0.72);
+}
+
+.attendance-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 760px;
+}
+
+.attendance-table th,
+.attendance-table td {
+  padding: 1rem;
+  text-align: left;
+  border-bottom: 1px solid rgba(24, 36, 51, 0.08);
+}
+
+.attendance-table th {
+  background: rgba(231, 238, 245, 0.8);
+  color: var(--secondary-ink);
+  font-size: 0.92rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.attendance-table tbody tr:hover {
+  background: rgba(231, 238, 245, 0.45);
+}
+
+.table-status-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.35rem 0.7rem;
+  border-radius: 999px;
+  font-size: 0.88rem;
+  font-weight: 700;
+}
+
+.table-status-present {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.table-status-absent {
+  background: #fff1eb;
+  color: #c2410c;
+}
+
+.table-empty-state {
+  text-align: center;
+  color: var(--muted);
 }
 
 .chart-track {
@@ -382,6 +554,14 @@ a {
 
   .stats-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .pie-card-content {
+    grid-template-columns: 1fr;
+  }
+
+  .table-filter-row {
+    grid-template-columns: 1fr;
   }
 }
 
