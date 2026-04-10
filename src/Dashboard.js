@@ -140,7 +140,8 @@ function Dashboard({ user, lecturerId, signOut }) {
             throw new Error("AWS dashboard API request failed.");
           }
 
-          const data = await response.json();
+          const raw = await response.json();
+          const data = typeof raw.body === 'string' ? JSON.parse(raw.body) : raw;
           if (isMounted) {
             setDashboardData(data);
           }
