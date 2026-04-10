@@ -39,7 +39,8 @@ function StudentRegistration({ lecturerId }) {
     const reader = new FileReader();
     reader.onloadend = () => {
       const result = reader.result?.toString() ?? "";
-      setFaceImageBase64(result);
+      const base64Only = result.split(",")[1] ?? "";
+      setFaceImageBase64(base64Only);
       setPreviewImage(result);
       setStatus("Face image uploaded successfully.");
     };
@@ -59,6 +60,14 @@ function StudentRegistration({ lecturerId }) {
     setStatus("Saving student profile...");
 
     try {
+      console.log("STUDENT_API_URL:", STUDENT_API_URL);
+      console.log("Submitting payload:", {
+        student_name: form.studentName,
+        file_name: faceImageFile?.name,
+        lecturer_id: lecturerId,
+        image_base64: faceImageBase64?.slice(0, 100) + "...", // avoid flooding console
+      });
+
       if (STUDENT_API_URL) {
         const response = await fetch(STUDENT_API_URL, {
           method: "POST",
@@ -73,10 +82,19 @@ function StudentRegistration({ lecturerId }) {
           }),
         });
 
+        console.log("Response status:", response.status);
+        console.log("Response ok:", response.ok);
+
+        const responseText = await response.text();
+        console.log("Response body:", responseText);
+
         if (!response.ok) {
-          throw new Error("AWS student registration API request failed.");
+          throw new Error(
+            `AWS student registration API request failed. Status: ${response.status}, Body: ${responseText}`
+          );
         }
       } else {
+        console.warn("Missing REACT_APP_STUDENT_REGISTRATION_API_URL");
         await new Promise((resolve) => setTimeout(resolve, 800));
       }
 
@@ -86,6 +104,7 @@ function StudentRegistration({ lecturerId }) {
           : "Student registration image captured. Add REACT_APP_STUDENT_REGISTRATION_API_URL to connect AWS."
       );
     } catch (err) {
+      console.error("Save student error:", err);
       setError(err.message);
       setStatus("Student registration failed.");
     } finally {
