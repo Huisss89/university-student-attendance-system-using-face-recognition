@@ -4,61 +4,6 @@ import { Link } from "react-router-dom";
 const DASHBOARD_API_URL = process.env.REACT_APP_DASHBOARD_API_URL;
 const EXPORT_ATTENDANCE_API_URL = process.env.REACT_APP_EXPORT_ATTENDANCE_API_URL;
 
-const mockDashboardData = {
-  summary: {
-    totalStudents: 100,
-    todayAttendance: 94,
-  },
-  studentAttendance: [
-    { name: "Chong Jia Hui", percentage: 92 },
-    { name: "Peggy Wong", percentage: 88 },
-    { name: "Ho Jin Xin", percentage: 95 },
-    { name: "Wong Mei Kuan", percentage: 84 },
-  ],
-  attendanceRecords: [
-    {
-      studentId: "2200111",
-      studentName: "Chong Jia Hui",
-      course: "AI Fundamentals",
-      date: "2026-04-09",
-      time: "08:15",
-      status: "Present",
-    },
-    {
-      studentId: "2200222",
-      studentName: "Peggy Wong",
-      course: "Machine Learning",
-      date: "2026-04-09",
-      time: "08:20",
-      status: "Absent",
-    },
-    {
-      studentId: "2200333",
-      studentName: "Ho Jin Xin",
-      course: "Cloud Computing",
-      date: "2026-04-09",
-      time: "08:23",
-      status: "Present",
-    },
-    {
-      studentId: "2200444",
-      studentName: "Wong Mei Kuan",
-      course: "Computer Vision",
-      date: "2026-04-08",
-      time: "10:05",
-      status: "Present",
-    },
-    {
-      studentId: "2200555",
-      studentName: "Tan Jia Min",
-      course: "AI Fundamentals",
-      date: "2026-04-08",
-      time: "10:11",
-      status: "Absent",
-    },
-  ],
-};
-
 function AttendancePieChart({ presentCount, absentCount }) {
   const total = presentCount + absentCount;
   const presentRatio = total > 0 ? presentCount / total : 0;
@@ -117,7 +62,7 @@ function AttendancePieChart({ presentCount, absentCount }) {
 }
 
 function Dashboard({ user, lecturerId, signOut }) {
-  const [dashboardData, setDashboardData] = useState(mockDashboardData);
+  const [dashboardData, setDashboardData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [exportStatus, setExportStatus] = useState("");
@@ -166,11 +111,9 @@ function Dashboard({ user, lecturerId, signOut }) {
     };
   }, []);
 
-  const summary = dashboardData?.summary ?? mockDashboardData.summary;
-  const studentAttendance =
-    dashboardData?.studentAttendance ?? mockDashboardData.studentAttendance;
-  const attendanceRecords =
-    dashboardData?.attendanceRecords ?? mockDashboardData.attendanceRecords;
+  const summary = dashboardData?.summary ?? { totalStudents: '-', todayAttendance: '-' };
+const studentAttendance = dashboardData?.studentAttendance ?? [];
+const attendanceRecords = dashboardData?.attendanceRecords ?? [];
 
   const totalStudents = summary?.totalStudents ?? 0;
   const presentCount = summary?.todayAttendance ?? 0;
