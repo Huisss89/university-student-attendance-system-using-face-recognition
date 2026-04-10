@@ -165,6 +165,41 @@ const attendanceRecords = dashboardData?.attendanceRecords ?? [];
     }
   };
 
+  if (loading) {
+    return (
+      <main className="page-shell">
+        <section className="page-header">
+          <div>
+            <h1>Lecturer Dashboard</h1>
+            {lecturerId && <p className="hero-copy">Lecturer ID: {lecturerId}</p>}
+          </div>
+          <div className="action-row">
+            <Link to="/register-student" className="btn btn-secondary">
+              Register Student
+            </Link>
+            <button
+              className="btn btn-secondary"
+              onClick={exportAttendanceRecords}
+              disabled={isExporting}
+            >
+              {isExporting ? "Exporting..." : "Export Attendance"}
+            </button>
+            <button className="btn btn-primary" onClick={signOut}>
+              Sign Out
+            </button>
+          </div>
+        </section>
+
+        <section className="center-content">
+          <div className="panel-card" style={{ padding: "2rem", textAlign: "center" }}>
+            <div className="loader" />
+            <p className="status-text">Loading dashboard...</p>
+          </div>
+        </section>
+      </main>
+    );
+  }
+
   return (
     <main className="page-shell">
       <section className="page-header">
