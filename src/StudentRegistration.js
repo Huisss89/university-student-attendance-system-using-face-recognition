@@ -10,9 +10,11 @@ function StudentRegistration({ lecturerId }) {
   const [faceImageFile, setFaceImageFile] = useState(null);
   const [faceImageBase64, setFaceImageBase64] = useState("");
   const [previewImage, setPreviewImage] = useState("");
-  const [status, setStatus] = useState("Fill in the student details and upload a face image.");
+  const [status, setStatus] = useState("");
   const [error, setError] = useState("");
   const [isSaving, setIsSaving] = useState(false);
+  const [uploadSuccess, setUploadSuccess] = useState(false);
+  const [registerSuccess, setRegisterSuccess] = useState(false);
 
   const updateField = (event) => {
     const { name, value } = event.target;
@@ -22,6 +24,23 @@ function StudentRegistration({ lecturerId }) {
     }));
   };
 
+  const resetForm = () => {
+    setForm({ studentName: "" });
+    setFaceImageFile(null);
+    setFaceImageBase64("");
+    setPreviewImage("");
+    setStatus("Fill in the student details and upload a face image.");
+    setError("");
+    setIsSaving(false);
+    setUploadSuccess(false);
+    setRegisterSuccess(false);
+
+    const fileInput = document.getElementById("faceImageUpload");
+    if (fileInput) {
+      fileInput.value = "";
+    }
+  };
+
   const handleImageUpload = (event) => {
     const file = event.target.files?.[0];
 
@@ -29,11 +48,15 @@ function StudentRegistration({ lecturerId }) {
       setFaceImageFile(null);
       setFaceImageBase64("");
       setPreviewImage("");
+      setUploadSuccess(false);
+      setRegisterSuccess(false);
       setError("Please select a valid image file.");
       return;
     }
 
     setError("");
+    setUploadSuccess(false);
+    setRegisterSuccess(false);
     setFaceImageFile(file);
 
     const reader = new FileReader();
@@ -42,7 +65,7 @@ function StudentRegistration({ lecturerId }) {
       const base64Only = result.split(",")[1] ?? "";
       setFaceImageBase64(base64Only);
       setPreviewImage(result);
-      setStatus("Face image uploaded successfully.");
+      setStatus("Image selected. Ready to save.");
     };
     reader.readAsDataURL(file);
   };
@@ -57,6 +80,8 @@ function StudentRegistration({ lecturerId }) {
 
     setIsSaving(true);
     setError("");
+    setUploadSuccess(false);
+    setRegisterSuccess(false);
     setStatus("Saving student profile...");
 
     try {
@@ -65,7 +90,7 @@ function StudentRegistration({ lecturerId }) {
         student_name: form.studentName,
         file_name: faceImageFile?.name,
         lecturer_id: lecturerId,
-        image_base64: faceImageBase64?.slice(0, 100) + "...", // avoid flooding console
+        image_base64: faceImageBase64?.slice(0, 100) + "...",
       });
 
       if (STUDENT_API_URL) {
@@ -93,20 +118,24 @@ function StudentRegistration({ lecturerId }) {
             `AWS student registration API request failed. Status: ${response.status}, Body: ${responseText}`
           );
         }
+
+        setStatus("Face image uploaded successfully.");
+        setUploadSuccess(true);
+        setRegisterSuccess(true);
       } else {
         console.warn("Missing REACT_APP_STUDENT_REGISTRATION_API_URL");
         await new Promise((resolve) => setTimeout(resolve, 800));
-      }
 
-      setStatus(
-        STUDENT_API_URL
-          ? "Student registration image sent to AWS successfully."
-          : "Student registration image captured. Add REACT_APP_STUDENT_REGISTRATION_API_URL to connect AWS."
-      );
+        setStatus("Face image uploaded successfully.");
+        setUploadSuccess(true);
+        setRegisterSuccess(true);
+      }
     } catch (err) {
       console.error("Save student error:", err);
       setError(err.message);
       setStatus("Student registration failed.");
+      setUploadSuccess(false);
+      setRegisterSuccess(false);
     } finally {
       setIsSaving(false);
     }
@@ -155,21 +184,57 @@ function StudentRegistration({ lecturerId }) {
               accept="image/*"
               onChange={handleImageUpload}
             />
+            <small className="status-text">
+              File naming format:<strong> use studentID.png</strong> <strong> "2202222.png"</strong>
+            </small>
           </label>
 
-          <p className="status-text">{status}</p>
-
-          {faceImageFile && (
-            <p className="status-text">Image ready: {faceImageFile.name}</p>
+          {uploadSuccess && faceImageFile ? (
+            <div
+              style={{
+                backgroundColor: "#e8f8ee",
+                border: "1px solid #28a745",
+                color: "#155724",
+                padding: "12px",
+                borderRadius: "8px",
+                marginBottom: "12px",
+              }}
+            >
+              <p style={{ margin: 0, fontWeight: "600" }}>
+                Face image uploaded successfully.
+              </p>
+              <p style={{ margin: "6px 0 0 0" }}>
+                Image ready: {faceImageFile.name}
+              </p>
+            </div>
+          ) : (
+            <p className="status-text">{status}</p>
           )}
 
           {previewImage && (
-            <img src={previewImage} alt="Student face preview" className="camera-frame" />
+            <img
+              src={previewImage}
+              alt="Student face preview"
+              className="camera-frame"
+            />
           )}
 
+          <div style={{ display: "flex", justifyContent: "space-between", marginTop: "12px" }}>
+            
           <button className="btn btn-primary" type="submit" disabled={isSaving}>
             {isSaving ? "Saving..." : "Save Student"}
           </button>
+          
+            {registerSuccess && (
+              <button
+                type="button"
+                className="btn btn-secondary"
+                onClick={resetForm}
+              >
+                Register Another Student
+              </button>
+            )}
+          </div>
         </form>
       </section>
     </main>
