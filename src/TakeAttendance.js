@@ -2,6 +2,17 @@ import React, { useEffect, useRef, useState } from "react";
 
 const ATTENDANCE_API_URL = process.env.REACT_APP_ATTENDANCE_API_URL;
 
+const dataURLtoBlob = (dataURL) => {
+  const byteString = atob(dataURL.split(',')[1]);
+  const mimeString = dataURL.split(',')[0].split(':')[1].split(';')[0];
+  const ab = new ArrayBuffer(byteString.length);
+  const ia = new Uint8Array(ab);
+  for (let i = 0; i < byteString.length; i++) {
+    ia[i] = byteString.charCodeAt(i);
+  }
+  return new Blob([ab], { type: mimeString });
+};
+
 function TakeAttendance() {
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
@@ -46,9 +57,7 @@ function TakeAttendance() {
 
     try {
       const stream = await navigator.mediaDevices.getUserMedia({
-        video: {
-          facingMode: "user",
-        },
+        video: { facingMode: "user" },
       });
 
       streamRef.current = stream;
@@ -79,55 +88,49 @@ function TakeAttendance() {
     const video = videoRef.current;
     const canvas = canvasRef.current;
 
-    if (!video || !canvas) {
-      return;
-    }
+    if (!video || !canvas) return;
 
     canvas.width = video.videoWidth;
     canvas.height = video.videoHeight;
     const context = canvas.getContext("2d");
     context.drawImage(video, 0, 0, canvas.width, canvas.height);
 
-    setCaptured(canvas.toDataURL("image/jpeg", 0.92));
+    const dataUrl = canvas.toDataURL("image/png");
+    setCaptured(dataUrl);
     setStatus("Preview captured. Submit when you are ready.");
     stopCamera();
   };
 
   const submitAttendance = async () => {
-    if (!captured) {
-      return;
-    }
+    if (!captured) return;
 
     setIsSubmitting(true);
     setError("");
-    setStatus("Submitting attendance...");
+    setStatus("Requesting secure upload link...");
 
     try {
-      if (ATTENDANCE_API_URL) {
-        const response = await fetch(ATTENDANCE_API_URL, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            image: captured,
-            capturedAt: new Date().toISOString(),
-          }),
-        });
+      const apiResponse = await fetch(ATTENDANCE_API_URL);
+      if (!apiResponse.ok) throw new Error("Failed to get upload URL from API Gateway.");
 
-        if (!response.ok) {
-          throw new Error("AWS attendance API request failed.");
-        }
-      } else {
-        await new Promise((resolve) => setTimeout(resolve, 900));
-      }
+      const { upload_url } = await apiResponse.json();
 
-      setStatus(
-        ATTENDANCE_API_URL
-          ? "Attendance sent to AWS successfully."
-          : "Attendance capture ready. Add REACT_APP_ATTENDANCE_API_URL to connect AWS."
-      );
+      setStatus("Uploading image to S3...");
+      const imageBlob = dataURLtoBlob(captured);
+
+      const s3Response = await fetch(upload_url, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "image/png",
+        },
+        body: imageBlob,
+      });
+
+      if (!s3Response.ok) throw new Error("S3 Upload failed. Check CORS settings.");
+
+      setStatus("Success! Attendance recorded.");
+      setCaptured("");
     } catch (err) {
+      console.error(err);
       setError(err.message);
       setStatus("Attendance submission failed.");
     } finally {
@@ -142,13 +145,12 @@ function TakeAttendance() {
           <p className="eyebrow">Student Attendance</p>
           <h1>Open camera, capture face, and record attendance</h1>
           <p className="hero-copy">
-            This page keeps the attendance flow public so students can check in
-            quickly without lecturer login.
+            Check-in quickly without login.
           </p>
           <div className="feature-list">
             <span>Live camera preview</span>
             <span>One-click picture capture</span>
-            <span>AWS API hook for later integration</span>
+            <span>AWS API Integration</span>
           </div>
         </div>
 
@@ -176,10 +178,7 @@ function TakeAttendance() {
                 playsInline
                 muted
                 className="camera-frame"
-                onLoadedMetadata={() => {
-                  setVideoReady(true);
-                  setStatus("Camera ready. Capture your face image.");
-                }}
+                onLoadedMetadata={() => setVideoReady(true)}
               />
               {!videoReady && (
                 <div className="camera-overlay">
@@ -197,7 +196,7 @@ function TakeAttendance() {
             </div>
           )}
 
-          <canvas ref={canvasRef} className="hidden-canvas" />
+          <canvas ref={canvasRef} className="hidden-canvas" style={{ display: "none" }} />
 
           {captured && (
             <div className="capture-stack">
