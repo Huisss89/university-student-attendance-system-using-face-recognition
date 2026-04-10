@@ -79,7 +79,7 @@ function Dashboard({ user, lecturerId, signOut }) {
 
       try {
         if (DASHBOARD_API_URL) {
-          const response = await fetch(DASHBOARD_API_URL);
+          const response = await fetch(`${DASHBOARD_API_URL}?lecturer_id=${lecturerId}`);
 
           if (!response.ok) {
             throw new Error("AWS dashboard API request failed.");
