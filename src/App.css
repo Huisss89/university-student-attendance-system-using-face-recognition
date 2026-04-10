@@ -1,6 +1,7 @@
 :root {
   --bg-top: #f7f4ea;
   --bg-bottom: #dce8f2;
+  --attendance-panel-height: 240px;
   --ink: #182433;
   --muted: #5b6776;
   --panel: rgba(255, 255, 255, 0.86);
@@ -232,6 +233,26 @@ a {
   gap: 1rem;
 }
 
+/* Keep the student attendance list scrollable inside its panel */
+.chart-list {
+  /* fallback for standalone uses */
+  max-height: 320px;
+  overflow-y: auto;
+  padding-right: 0.5rem; /* room for scrollbar */
+}
+
+/* Optional nicer scrollbar for WebKit browsers */
+.chart-list::-webkit-scrollbar {
+  width: 10px;
+}
+.chart-list::-webkit-scrollbar-thumb {
+  background: rgba(15,118,110,0.18);
+  border-radius: 999px;
+}
+.chart-list::-webkit-scrollbar-thumb:hover {
+  background: rgba(15,118,110,0.28);
+}
+
 .capture-stack {
   position: relative;
 }
@@ -329,6 +350,45 @@ a {
 .chart-row {
   display: grid;
   gap: 0.45rem;
+}
+
+/* Make the two panels in the layout equal height and let the chart-list fill its panel */
+.two-column-layout {
+  align-items: stretch; /* make columns equal height */
+}
+
+.two-column-layout .panel-card {
+  display: flex;
+  flex-direction: column;
+  min-height: 0; /* allow children to scroll */
+}
+
+.two-column-layout .panel-card > .panel-header {
+  flex: 0 0 auto;
+}
+
+.two-column-layout .panel-card > .pie-card-content,
+.two-column-layout .panel-card > .chart-list {
+  flex: 1 1 auto;
+  min-height: 0; /* allow proper overflow behaviour */
+}
+
+/* Keep the left pie area constrained so it doesn't grow — use the shared height */
+.pie-chart-shell {
+  max-height: var(--attendance-panel-height);
+  width: min(100%, 240px);
+}
+
+.two-column-layout .panel-card > .pie-card-content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Make student attendance list match the pie height and scroll internally */
+.two-column-layout .panel-card > .chart-list {
+  max-height: var(--attendance-panel-height);
+  overflow-y: auto;
 }
 
 .pie-card-content {
