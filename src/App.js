@@ -82,26 +82,53 @@ function ProtectedRoute({ isAuthenticated, isSigningOut, children }) {
 function LecturerLogin({ isBusy, onSignIn }) {
   return (
     <div className="page-shell center-content">
-      <section className="hero-card auth-card">
-        <p className="eyebrow">Lecturer Access</p>
-        <h1>Sign in with your university identity provider</h1>
-        <p className="hero-copy">
-          This login flow uses Cognito Hosted UI directly and clears the local
-          browser session before each sign-in attempt.
-        </p>
-        {!cognitoDomain && (
-          <div className="alert error-alert">
-            Set <code>REACT_APP_COGNITO_DOMAIN</code> to your Cognito Hosted UI
-            domain.
+      <section className="hero-card auth-card login-enhanced">
+        <div className="login-main">
+          <div>
+            <h1>Lecturer Sign in</h1>
+            <p className="hero-copy">
+              Access your class dashboard to take attendance, manage student
+              registrations and review session history. Sign in with your
+              university identity provider for secure single sign-on.
+            </p>
+
+            <div className="feature-list" style={{ marginTop: "1rem" }}>
+              <span className="status-pill idle">Dashboard</span>
+              <span className="status-pill idle">Attendance</span>
+              <span className="status-pill idle">Student Registry</span>
+              <span className="status-pill live">SSO Secure</span>
+            </div>
           </div>
-        )}
-        <button
-          className="btn btn-primary btn-wide"
-          onClick={onSignIn}
-          disabled={!cognitoDomain || isBusy}
-        >
-          {isBusy ? "Redirecting..." : "Continue with OIDC"}
-        </button>
+
+          <div className="login-illustration" aria-hidden>
+            <svg width="100%" height="100%" viewBox="0 0 240 140" xmlns="http://www.w3.org/2000/svg" role="img" aria-hidden="true">
+              <rect x="0" y="0" width="240" height="140" rx="10" fill="#f4faf8" />
+              <g transform="translate(12,18)" fill="none" stroke="#cfeee7" strokeWidth="2">
+                <rect x="0" y="0" width="100" height="24" rx="6" fill="#e8f6f3" stroke="none" />
+                <rect x="0" y="34" width="220" height="12" rx="6" />
+                <rect x="0" y="54" width="180" height="12" rx="6" />
+                <rect x="0" y="74" width="140" height="12" rx="6" />
+              </g>
+            </svg>
+          </div>
+        </div>
+
+        <div className="login-actions" style={{ marginTop: "1.25rem" }}>
+          {!cognitoDomain && (
+            <div className="alert error-alert">
+              Set <code>REACT_APP_COGNITO_DOMAIN</code> to your Cognito Hosted UI
+              domain.
+            </div>
+          )}
+
+          <button
+            className="btn btn-primary btn-wide"
+            onClick={onSignIn}
+            disabled={!cognitoDomain || isBusy}
+          >
+            {isBusy ? "Redirecting..." : "Continue with Sign In"}
+          </button>
+        </div>
       </section>
     </div>
   );
