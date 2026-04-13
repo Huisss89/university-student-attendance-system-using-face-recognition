@@ -138,26 +138,23 @@ const attendanceRecords = dashboardData?.attendanceRecords ?? [];
       if (EXPORT_ATTENDANCE_API_URL) {
         const exportUrl = new URL(EXPORT_ATTENDANCE_API_URL);
 
-        if (lecturerId) {
-          exportUrl.searchParams.set("lecturer_id", lecturerId);
-        }
-        if (dateFilter) {
-          exportUrl.searchParams.set("date", dateFilter);
-        }
-        if (studentFilter) {
-          exportUrl.searchParams.set("student_filter", studentFilter);
-        }
+        if (lecturerId) exportUrl.searchParams.set("lecturer_id", lecturerId);
+        if (dateFilter) exportUrl.searchParams.set("date", dateFilter);
+        if (studentFilter) exportUrl.searchParams.set("student_filter", studentFilter);
 
-        window.open(exportUrl.toString(), "_blank", "noopener,noreferrer");
-      } else {
-        await new Promise((resolve) => setTimeout(resolve, 700));
+        const response = await fetch(exportUrl.toString());
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = `attendance_${new Date().toISOString().slice(0,10)}.csv`;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        window.URL.revokeObjectURL(url);
+
+        setExportStatus("Attendance exported successfully.");
       }
-
-      setExportStatus(
-        EXPORT_ATTENDANCE_API_URL
-          ? "Attendance export opened successfully."
-          : "Export button is ready. Add REACT_APP_EXPORT_ATTENDANCE_API_URL to connect AWS."
-      );
     } catch (err) {
       setExportStatus(err.message);
     } finally {
