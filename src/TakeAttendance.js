@@ -207,7 +207,7 @@ function TakeAttendance() {
                   onClick={submitAttendance}
                   disabled={isSubmitting}
                 >
-                  {isSubmitting ? "Sending..." : "Send to AWS"}
+                  {isSubmitting ? "Sending..." : "Recording Attendance"}
                 </button>
                 <button className="btn btn-secondary" onClick={startCamera}>
                   Retake Picture
