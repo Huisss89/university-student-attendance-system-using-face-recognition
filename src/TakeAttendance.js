@@ -2,17 +2,6 @@ import React, { useEffect, useRef, useState } from "react";
 
 const ATTENDANCE_API_URL = process.env.REACT_APP_ATTENDANCE_API_URL;
 
-const dataURLtoBlob = (dataURL) => {
-  const byteString = atob(dataURL.split(',')[1]);
-  const mimeString = dataURL.split(',')[0].split(':')[1].split(';')[0];
-  const ab = new ArrayBuffer(byteString.length);
-  const ia = new Uint8Array(ab);
-  for (let i = 0; i < byteString.length; i++) {
-    ia[i] = byteString.charCodeAt(i);
-  }
-  return new Blob([ab], { type: mimeString });
-};
-
 function TakeAttendance() {
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
@@ -22,7 +11,14 @@ function TakeAttendance() {
   const [videoReady, setVideoReady] = useState(false);
   const [error, setError] = useState("");
   const [status, setStatus] = useState("Waiting for student check-in.");
+  const [statusType, setStatusType] = useState("info");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [canSubmit, setCanSubmit] = useState(true);
+
+  const setStatusMsg = (msg, type = "info") => {
+    setStatus(msg);
+    setStatusType(type);
+  };
 
   useEffect(() => {
     return () => {
@@ -53,7 +49,8 @@ function TakeAttendance() {
     setError("");
     setCaptured("");
     setVideoReady(false);
-    setStatus("Opening camera...");
+    setCanSubmit(true);
+    setStatusMsg("Opening camera...");
 
     try {
       const stream = await navigator.mediaDevices.getUserMedia({
@@ -62,10 +59,10 @@ function TakeAttendance() {
 
       streamRef.current = stream;
       setCameraOn(true);
-      setStatus("Camera connected. Starting preview...");
+      setStatusMsg("Camera connected. Starting preview...");
     } catch (err) {
       setError("Unable to access camera. Please allow camera permission.");
-      setStatus(err.message);
+      setStatusMsg(err.message, "error");
     }
   };
 
@@ -92,12 +89,11 @@ function TakeAttendance() {
 
     canvas.width = video.videoWidth;
     canvas.height = video.videoHeight;
-    const context = canvas.getContext("2d");
-    context.drawImage(video, 0, 0, canvas.width, canvas.height);
+    canvas.getContext("2d").drawImage(video, 0, 0, canvas.width, canvas.height);
 
-    const dataUrl = canvas.toDataURL("image/png");
-    setCaptured(dataUrl);
-    setStatus("Preview captured. Submit when you are ready.");
+    setCaptured(canvas.toDataURL("image/png"));
+    setCanSubmit(true);
+    setStatusMsg("Preview captured. Submit when you are ready.");
     stopCamera();
   };
 
@@ -106,37 +102,62 @@ function TakeAttendance() {
 
     setIsSubmitting(true);
     setError("");
-    setStatus("Requesting secure upload link...");
+    setStatusMsg("Analyzing face, please wait...", "info");
 
     try {
-      const apiResponse = await fetch(ATTENDANCE_API_URL);
-      if (!apiResponse.ok) throw new Error("Failed to get upload URL from API Gateway.");
-
-      const { upload_url } = await apiResponse.json();
-
-      setStatus("Uploading image to S3...");
-      const imageBlob = dataURLtoBlob(captured);
-
-      const s3Response = await fetch(upload_url, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "image/png",
-        },
-        body: imageBlob,
+      const base64Image = captured.split(',')[1];
+      const response = await fetch(ATTENDANCE_API_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ image: base64Image }),
       });
 
-      if (!s3Response.ok) throw new Error("S3 Upload failed. Check CORS settings.");
+      const data = await response.json();
 
-      setStatus("Success! Attendance recorded.");
-      setCaptured("");
+      // Results
+      switch (data.result) {
+        case 'success':
+          const name = data.marked_students?.[0]?.student_name || "Student";
+          setStatusMsg(`Attendance recorded successfully! Welcome, ${name}.`, "success");
+          setCaptured("");
+          break;
+
+        case 'duplicate':
+          setStatusMsg("Your attendance has already been recorded today.", "warning");
+          setCaptured("");
+          break;
+
+        case 'no_face':
+          setStatusMsg("No face detected. Please retake the photo in better lighting.", "warning");
+          setCanSubmit(false);
+          break;
+
+        case 'unrecognized':
+          setStatusMsg("Face not recognized or registered. Please contact your lecturer for help.", "error");
+          setCanSubmit(false);
+          break;
+
+        default:
+          setStatusMsg("System could not verify identity. Please try again.", "error");
+          setCanSubmit(false);
+      }
+
     } catch (err) {
-      console.error(err);
-      setError(err.message);
-      setStatus("Attendance submission failed.");
+      console.error("API Error:", err);
+      setError("Connection error. Please check your internet.");
+      setStatusMsg("Submission failed. Please try again.", "error");
+      setCanSubmit(false);
     } finally {
       setIsSubmitting(false);
     }
   };
+
+  const statusClass = {
+    info: "status-text",
+    success: "status-text status-success",
+    warning: "status-text status-warning",
+    error: "status-text status-error",
+  }[statusType];
 
   return (
     <main className="page-shell">
@@ -144,9 +165,7 @@ function TakeAttendance() {
         <div className="hero-card">
           <p className="eyebrow">Student Attendance</p>
           <h1>Open camera, capture face, and record attendance</h1>
-          <p className="hero-copy">
-            Check-in quickly without login.
-          </p>
+          <p className="hero-copy">Check-in quickly without login.</p>
           <div className="feature-list">
             <span>Live camera preview</span>
             <span>One-click picture capture</span>
@@ -196,27 +215,35 @@ function TakeAttendance() {
             </div>
           )}
 
-          <canvas ref={canvasRef} className="hidden-canvas" style={{ display: "none" }} />
+          <canvas ref={canvasRef} style={{ display: "none" }} />
 
           {captured && (
             <div className="capture-stack">
               <img src={captured} alt="Attendance preview" className="camera-frame" />
               <div className="action-row">
+                {/* ONLY show the Submit button if canSubmit is true */}
+                {canSubmit && (
+                  <button
+                    className="btn btn-primary"
+                    onClick={submitAttendance}
+                    disabled={isSubmitting}
+                  >
+                    {isSubmitting ? "Processing..." : "Submit Photo"}
+                  </button>
+                )}
+
                 <button
-                  className="btn btn-primary"
-                  onClick={submitAttendance}
+                  className="btn btn-secondary"
+                  onClick={startCamera}
                   disabled={isSubmitting}
                 >
-                  {isSubmitting ? "Sending..." : "Recording Attendance"}
-                </button>
-                <button className="btn btn-secondary" onClick={startCamera}>
                   Retake Picture
                 </button>
               </div>
             </div>
           )}
 
-          <p className="status-text">{status}</p>
+          <p className={statusClass}>{status}</p>
         </div>
       </section>
     </main>

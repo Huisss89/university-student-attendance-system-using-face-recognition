@@ -234,8 +234,8 @@ a {
   width: 240px;
   height: 140px;
   border-radius: 12px;
-  box-shadow: 0 8px 28px rgba(15,118,110,0.06);
-  background: linear-gradient(180deg, rgba(15,118,110,0.03), rgba(194,65,12,0.02));
+  box-shadow: 0 8px 28px rgba(15, 118, 110, 0.06);
+  background: linear-gradient(180deg, rgba(15, 118, 110, 0.03), rgba(194, 65, 12, 0.02));
   display: flex;
   align-items: center;
   justify-content: center;
@@ -268,19 +268,22 @@ a {
   /* fallback for standalone uses */
   max-height: 320px;
   overflow-y: auto;
-  padding-right: 0.5rem; /* room for scrollbar */
+  padding-right: 0.5rem;
+  /* room for scrollbar */
 }
 
 /* Optional nicer scrollbar for WebKit browsers */
 .chart-list::-webkit-scrollbar {
   width: 10px;
 }
+
 .chart-list::-webkit-scrollbar-thumb {
-  background: rgba(15,118,110,0.18);
+  background: rgba(15, 118, 110, 0.18);
   border-radius: 999px;
 }
+
 .chart-list::-webkit-scrollbar-thumb:hover {
-  background: rgba(15,118,110,0.28);
+  background: rgba(15, 118, 110, 0.28);
 }
 
 .capture-stack {
@@ -317,6 +320,21 @@ a {
   margin: 0;
   color: var(--muted);
   line-height: 1.6;
+}
+
+.status-text.status-success {
+  color: #16a34a;
+  font-weight: 600;
+}
+
+.status-text.status-warning {
+  color: #d97706;
+  font-weight: 600;
+}
+
+.status-text.status-error {
+  color: #dc2626;
+  font-weight: 600;
 }
 
 .alert {
@@ -384,23 +402,26 @@ a {
 
 /* Make the two panels in the layout equal height and let the chart-list fill its panel */
 .two-column-layout {
-  align-items: stretch; /* make columns equal height */
+  align-items: stretch;
+  /* make columns equal height */
 }
 
 .two-column-layout .panel-card {
   display: flex;
   flex-direction: column;
-  min-height: 0; /* allow children to scroll */
+  min-height: 0;
+  /* allow children to scroll */
 }
 
-.two-column-layout .panel-card > .panel-header {
+.two-column-layout .panel-card>.panel-header {
   flex: 0 0 auto;
 }
 
-.two-column-layout .panel-card > .pie-card-content,
-.two-column-layout .panel-card > .chart-list {
+.two-column-layout .panel-card>.pie-card-content,
+.two-column-layout .panel-card>.chart-list {
   flex: 1 1 auto;
-  min-height: 0; /* allow proper overflow behaviour */
+  min-height: 0;
+  /* allow proper overflow behaviour */
 }
 
 /* Keep the left pie area constrained so it doesn't grow — use the shared height */
@@ -409,14 +430,14 @@ a {
   width: min(100%, 240px);
 }
 
-.two-column-layout .panel-card > .pie-card-content {
+.two-column-layout .panel-card>.pie-card-content {
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
 /* Make student attendance list match the pie height and scroll internally */
-.two-column-layout .panel-card > .chart-list {
+.two-column-layout .panel-card>.chart-list {
   max-height: var(--attendance-panel-height);
   overflow-y: auto;
 }
@@ -630,6 +651,7 @@ a {
 }
 
 @media (max-width: 980px) {
+
   .topbar,
   .page-header,
   .panel-header,
@@ -656,6 +678,7 @@ a {
 }
 
 @media (max-width: 640px) {
+
   .page-shell,
   .topbar {
     padding: 1rem;
