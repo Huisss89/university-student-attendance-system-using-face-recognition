@@ -4,6 +4,7 @@ import "./App.css";
 import Dashboard from "./Dashboard";
 import StudentRegistration from "./StudentRegistration";
 import TakeAttendance from "./TakeAttendance";
+import About from "./About"
 
 const cognitoDomain = process.env.REACT_APP_COGNITO_DOMAIN?.replace(/\/$/, "");
 const clientId = "43rsa7qcapqblndupegmnk29nq";
@@ -308,6 +309,9 @@ function App() {
             <Link to="/login" className="menu-link">
               Lecturer Login
             </Link>
+            <Link to="/about" className="menu-link">
+              About
+            </Link>
           </nav>
         )}
       </header>
@@ -320,6 +324,7 @@ function App() {
 
       <Routes>
         <Route path="/" element={<TakeAttendance />} />
+        <Route path="/about" element={<About />} />
         <Route
           path="/login"
           element={

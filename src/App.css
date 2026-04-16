@@ -172,6 +172,17 @@ a {
   margin-bottom: 1.5rem;
 }
 
+.about-header {
+  justify-content: left;
+  text-align: left;
+}
+
+.about-section-header {
+  font-size: 1.5rem;
+  justify-content: center;
+  text-align: center;
+}
+
 .centered-form-wrapper {
   display: flex;
   justify-content: center;
@@ -399,6 +410,100 @@ a {
   display: grid;
   gap: 0.45rem;
 }
+
+/* About page responsive layouts */
+.about-features {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(220px, 100%), 1fr));
+  gap: 0.75rem;
+  width: 100%;
+  margin: 0;
+  grid-auto-flow: row dense;
+}
+
+.about-feature-card {
+  border-radius: 12px;
+  padding: 0.9rem;
+  background: linear-gradient(180deg, #ffffff, #fbfdff);
+  box-shadow: 0 8px 24px rgba(16,24,40,0.04);
+  border: 1px solid rgba(16,24,40,0.04);
+}
+
+.about-feature-row {
+  display: flex;
+  gap: 0.8rem;
+  align-items: center;
+}
+
+.about-feature-icon {
+  width: 52px;
+  height: 52px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  background: #f3faf8;
+}
+
+.about-feature-title { font-size: 16px; display: block; }
+.about-feature-desc { font-size: 15px; color: #556; }
+
+.about-services {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(240px, 100%), 1fr));
+  gap: 1rem;
+  width: 100%;
+  margin: 0.75rem 0 0;
+  grid-auto-flow: row dense;
+  justify-items: stretch;
+}
+
+.about-service-card {
+  border-radius: 8px;
+  padding: 1rem;
+  background: #fff;
+  box-shadow: 0 10px 30px rgba(16,24,40,0.06);
+  border: 1px solid rgba(16,24,40,0.04);
+}
+
+.about-service-row { display:flex; gap: 0.75rem; align-items: center; }
+.about-service-badge {
+  width: 56px;
+  height: 56px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  background: linear-gradient(180deg,#f0fbf6,#e8f7f0);
+  overflow: hidden;
+}
+.about-service-logo {
+  width: 70%;
+  height: 70%;
+  object-fit: contain;
+}
+.about-service-emoji {
+  line-height: 1;
+}
+.about-service-title { font-size: 16px; display:block }
+.about-service-subtitle { font-size: 14px; color: #666 }
+.about-service-desc { margin-top: 0.6rem; font-size: 15px; color: #334 }
+
+/* Responsive breakpoints for services/features grid */
+/* Fallback breakpoints to ensure desired columns on narrower screens */
+@media (max-width: 900px) {
+}
+
+@media (max-width: 560px) {
+  .about-feature-row,
+  .about-service-row {
+    align-items: flex-start;
+  }
+}
+
+/* auto-fit/minmax also helps, but these breakpoints ensure consistent behavior */
 
 /* Make the two panels in the layout equal height and let the chart-list fill its panel */
 .two-column-layout {
