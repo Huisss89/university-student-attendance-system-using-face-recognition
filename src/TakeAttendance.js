@@ -149,8 +149,7 @@ function TakeAttendance() {
       // Results
       switch (data.result) {
         case 'success':
-          const name = data.marked_students?.[0]?.student_name || "Student";
-          setStatusMsg(`Attendance recorded successfully! Welcome, ${name}.`, "success");
+          setStatusMsg("Attendance recorded successfully! Welcome!", "success");
           setCaptured("");
           break;
 
