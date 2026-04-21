@@ -145,9 +145,12 @@ function TakeAttendance() {
       });
 
       const data = await response.json();
+      const parsedBody = typeof data.body === "string"
+        ? JSON.parse(data.body)
+        : data;
 
       // Results
-      switch (data.result) {
+      switch (parsedBody.result) {
         case 'success':
           setStatusMsg("Attendance recorded successfully! Welcome!", "success");
           setCaptured("");
