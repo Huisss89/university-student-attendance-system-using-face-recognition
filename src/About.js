@@ -139,14 +139,6 @@ export default function About() {
       emoji: "🔎",
     },
     {
-      id: "quicksight",
-      title: "Amazon QuickSight",
-      subtitle: "BI dashboards",
-      description: "Visualizes attendance insights with interactive reports and dashboards.",
-      logo: "/assets/aws/quicksight.png",
-      emoji: "📉",
-    },
-    {
       id: "amplify",
       title: "AWS Amplify",
       subtitle: "Frontend hosting",
@@ -204,7 +196,6 @@ export default function About() {
         </div>
 
         <div style={{ padding: "1rem 0" }}>
-          {/* Prefer an uploaded image placed at public/assets/architecture.png */}
           {showImage ? (
             <img
               src="/assets/architecture.png"
