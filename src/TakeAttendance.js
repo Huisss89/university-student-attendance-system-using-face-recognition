@@ -192,6 +192,7 @@ function TakeAttendance() {
     warning: "status-text status-warning",
     error: "status-text status-error",
   }[statusType];
+  const isCameraExpanded = cameraOn || Boolean(captured);
 
   return (
     <main className="page-shell">
@@ -207,7 +208,11 @@ function TakeAttendance() {
           </div>
         </div>
 
-        <div className="panel-card scanner-card">
+        <div
+          className={`panel-card scanner-card ${
+            isCameraExpanded ? "scanner-card-preview" : "scanner-card-compact"
+          }`}
+        >
           <div className="panel-header">
             <h2>Attendance Camera</h2>
             <span className={`status-pill ${cameraOn ? "live" : "idle"}`}>

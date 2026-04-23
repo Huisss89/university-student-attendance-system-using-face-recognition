@@ -24,6 +24,11 @@ function StudentRegistration({ lecturerId }) {
     }));
   };
 
+  const isValidStudentIdFileName = (fileName) => {
+    const baseName = fileName.replace(/\.[^/.]+$/, "");
+    return /^\d{7}$/.test(baseName);
+  };
+
   const resetForm = () => {
     setForm({ studentName: "" });
     setFaceImageFile(null);
@@ -54,6 +59,17 @@ function StudentRegistration({ lecturerId }) {
       return;
     }
 
+    if (!isValidStudentIdFileName(file.name)) {
+      setFaceImageFile(null);
+      setFaceImageBase64("");
+      setPreviewImage("");
+      setUploadSuccess(false);
+      setRegisterSuccess(false);
+      setError("Invalid student ID. File name must be exactly 7 digits.");
+      event.target.value = "";
+      return;
+    }
+
     setError("");
     setUploadSuccess(false);
     setRegisterSuccess(false);
@@ -75,6 +91,11 @@ function StudentRegistration({ lecturerId }) {
 
     if (!form.studentName || !faceImageFile || !faceImageBase64) {
       setError("Student name and face image are required.");
+      return;
+    }
+
+    if (!isValidStudentIdFileName(faceImageFile.name)) {
+      setError("Invalid student ID. File name must be exactly 7 digits.");
       return;
     }
 
