@@ -2,7 +2,7 @@
 
 A React web application for automated classroom attendance using AWS face recognition services.
 
-Website link: [https://main.d3savsd531obwl.amplifyapp.com](https://university-student-attendance-syste-six.vercel.app/)
+Website link: https://university-student-attendance-syste-six.vercel.app/
 
 ## Overview
 
