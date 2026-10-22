@@ -109,8 +109,8 @@ function Dashboard({ user, lecturerId, signOut }) {
     return () => {
       isMounted = false;
     };
-  }, []);
-
+}, [lecturerId]);
+  
   const summary = dashboardData?.summary ?? { totalStudents: '-', todayAttendance: '-' };
 const studentAttendance = dashboardData?.studentAttendance ?? [];
 const attendanceRecords = dashboardData?.attendanceRecords ?? [];
