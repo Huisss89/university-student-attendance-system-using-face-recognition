@@ -4,6 +4,8 @@ A React web application for automated classroom attendance using AWS face recogn
 
 Website link: https://university-student-attendance-syste-six.vercel.app/
 
+![TakeAttendance](public/assets/attendance.png)
+
 ## Overview
 
 This project provides two main user experiences:
